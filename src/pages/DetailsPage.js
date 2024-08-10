@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import useFetchDetail from "../hooks/useFetchDetail";
 import { useSelector } from "react-redux";
@@ -6,6 +6,7 @@ import moment from "moment";
 import Divider from "../components/Divider";
 import useFetch from "../hooks/useFetch";
 import HorizontalScrollCard from "../components/HorizontalScrollCard";
+import VideoPlay from "../components/VideoPlay";
 
 const DetailsPage = () => {
   const params = useParams();
@@ -19,6 +20,8 @@ const DetailsPage = () => {
   const { data: recommendationData } = useFetch(
     `/${params?.explore}/${params?.id}/recommendations`
   );
+  const [playVideo, setPlayVideo] = useState(false);
+  const [playVideoId, setPlayVideoId] = useState("");
 
   const imageURL = useSelector((state) => state.movieoData.imageURL);
   const duration = (Number(data?.runtime) / 60).toFixed(1).split(".");
@@ -26,6 +29,12 @@ const DetailsPage = () => {
     ?.filter((el) => el?.job === "Writer")
     .map((el) => el?.name)
     .join(", ");
+
+  const handlePlayVideo = (data) => {
+    console.log(data);
+    setPlayVideoId(data);
+    setPlayVideo(true);
+  };
 
   return (
     <div>
@@ -50,6 +59,14 @@ const DetailsPage = () => {
             src={imageURL + data?.poster_path}
             className="h-80 w-60 object-cover rounded"
           />
+          <button
+            className="mt-3 w-full py-2 px-4 text-center bg-white text-black rounded font-bold
+          text-lg hover:bg-gradient-to-l from-red-500 to-orange-500 hover:scale-105 
+          transition-all"
+            onClick={() => handlePlayVideo(data)}
+          >
+            Play Now
+          </button>
         </div>
 
         <div>
@@ -135,6 +152,13 @@ const DetailsPage = () => {
           media_type={params?.explore}
         />
       </div>
+      {playVideo && (
+        <VideoPlay
+          data={playVideoId}
+          close={() => setPlayVideo(false)}
+          media_type={params?.explore}
+        />
+      )}
     </div>
   );
 };
